@@ -1,3 +1,3 @@
-lrrp-decoder
+LRRP DECODER
 ============
 
