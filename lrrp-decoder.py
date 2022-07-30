@@ -23,7 +23,7 @@ def parse_dsd_file(pos):
         lines = file.readlines()
         data = []
         
-        for line in lines: # filter the data bytes only
+        for line in lines: # filter the data bytes with locations
             if "Rate" in line:
                 splt_line = [x for x in line.split() if len(x) == 2 and x != "BS"]
                 data.append(splt_line)
