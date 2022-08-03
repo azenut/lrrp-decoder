@@ -21,18 +21,20 @@ def parse_dsd_file(pos):
     with open("./parsing/logfile.txt", "r") as file:
         
         lines = file.readlines()
-        data = []
+        packets = []
         
-        for line in lines: # filter the data bytes with locations
+        for line in lines: # filter the data bytes with locations from file
             if "Rate" in line:
                 splt_line = [x for x in line.split() if len(x) == 2 and x != "BS"]
-                data.append(splt_line)
-        data = [x for x in data if len(x) == 9]
-
-        for x in data:
-            coord = [lat_decode("".join(x[-8:-4])), long_decode("".join(x[-4:]))]
-            pos.append(coord)
-        
+                packets.append(splt_line)
+   
+    packets = "".join([x for y in packets for x in y if x]).split("4500002D") # splitting by IPv4 header
+    
+    for x in packets:
+        src = int(x[22:24], 16)
+        coord = [x[66:74], x[74:82]]
+        if coord[0] and coord[1] and "." not in coord[0] and "." not in coord[1]: #removing invalid positions
+            pos.append([src, [lat_decode(coord[0]), long_decode(coord[1])]])        
 
 # MAIN                   
 
@@ -42,5 +44,5 @@ parse_dsd_file(positions)
 
 m = folium.Map(location=[40.828301550404994, 16.553154320679383], tiles="OpenStreetMap", zoom_start=14)
 for x in positions:
-    folium.Marker(x).add_to(m)
+    folium.Marker(x[1], tooltip = f"{x[0]}").add_to(m)
 m.save("map.html")
